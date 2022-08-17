@@ -1,4 +1,7 @@
 {
-    "search_engine": "google",
-    "tbm": "isch"
+    "serapi": {
+        "search_engine": "google",
+        "tbm": "isch"    
+    },
+    "num_threads": 10
 }
