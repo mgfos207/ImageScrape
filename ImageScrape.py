@@ -34,8 +34,6 @@ class ImageDownloadThread(threading.Thread):
             opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19582')]
             urllib.request.install_opener(opener)
             image_name = image['original']
-            #TO-DO find a better way to get image suffix
-            suffix = pathlib.Path(image_name).suffix
             try:
                 urllib.request.urlretrieve(image['original'], f'{self.save_results_path}/{self.folder_name}_{self.thread_id}_{idx}.jpg')
             except Exception as e:
@@ -110,22 +108,6 @@ def main() -> None:
     with open("{}/config/image_scrapper_config.json".format(path)) as config_file:
         config = json.load(config_file)
 
-
-    # try:
-    #     #Get image data using the threading class
-    #     imgs_data = get_img_data(df)
-    #     #split the data into chunks for the 10 threads
-    #     data_length = len(imgs_data)
-    #     chunks = math.ceil(data_length / 50)
-    #     #store the chunks into different arrays perhaps a list of lists
-    #     chunked_list = [imgs_data[i: i+chunks] for i in range(0, data_length, chunks)]
-    #     #create different threads
-    #     for idx, chunk in enumerate(chunked_list):
-    #         img_thread = ImageDownloadThread(idx, f'img_thread-{idx}', chunk)
-    #         img_thread.start()
-    # except Exception as e:
-    #     print(f"Having problems persisting the images from the data onto file system: {e}")
-
     try:
         #get the images from search query
         image_results = fetchImages(config['serapi'], 1, query)
@@ -159,21 +141,6 @@ def main() -> None:
             logging.error(f"Error fetching all the images due to the following error: {e}")
         finally:
             logging.info("Finished process of fetching images based on user query")
-        # for index, image in enumerate(image_results):
-        #     logging.info("Saving file {}".format(image))
-        #     opener=urllib.request.build_opener()
-        #     opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19582')]
-        #     urllib.request.install_opener(opener)
-        #     image_name = image['original']
-        #     #TO-DO find a better way to get image suffix
-        #     suffix = pathlib.Path(image_name).suffix
-        #     try:
-        #         urllib.request.urlretrieve(image['original'], f'{save_results_path}/{folder_name}_{index}.jpg')
-        #     except Exception as e:
-        #         logging.error(f"Issue downloading image {e}")
-
-        # logging.info("Ended job for fetching images")
-
 
 if __name__ == '__main__':
     main()
