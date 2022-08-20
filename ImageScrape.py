@@ -70,7 +70,8 @@ def init_argparse() -> argparse.ArgumentParser:
 def fetchImages(config, num=1, query=None) -> list:
     #fetch the data if query is set
     image_results_collection = list()
-    if query is not None:
+    API_KEY = os.getenv('GS_APIKEY')
+    if query is not None and API_KEY is not None:
         increment = 1
         
         #make repeated requests to Google API until all the requested info is complete
@@ -92,6 +93,8 @@ def fetchImages(config, num=1, query=None) -> list:
             else:
                 break
             increment += 1
+        else:
+            raise Exception("Missing one or both required attributes: query, GS_APIKEY")
     
     return image_results_collection
 
@@ -134,13 +137,20 @@ def main() -> None:
 
         logging.info("Starting the threads for fetching images from Google Serapi")
         try:
+            thread_list = list()
             for idx, chunk in enumerate(chunked_list):
                 img_thread = ImageDownloadThread(idx, f'img_thread-{idx}', logging, chunk, save_results_path, folder_name)
                 img_thread.start()
+                thread_list.append(img_thread)
+            
+            #Join threads onto the main thread so the program doesn't prematurely finish
+            for thread in thread_list:
+                thread.join()
         except Exception as e:
             logging.error(f"Error fetching all the images due to the following error: {e}")
         finally:
             logging.info("Finished process of fetching images based on user query")
+            print("Finished pulling images")
 
 if __name__ == '__main__':
     main()
